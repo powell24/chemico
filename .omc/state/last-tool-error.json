@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"cd \\\"C:/Zaigo/Mockup/Chemico\\\" && pnpm dev 2>&1\",\"timeout\":30000,\"description\":\"Try running the dev server to see the error\"}",
-  "error": "Exit code 1\n\n> chemico-temp@0.1.0 dev C:\\Zaigo\\Mockup\\Chemico\n> next dev\n\nnode:internal/modules/cjs/loader:1247\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Zaigo\\Mockup\\Chemico\\node_modules\\next\\dist\\bin\\next'\r\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1244:15)\r\n    at Function._load (node:internal/modules/cjs/loader:1070:27)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:217:24)\r\n    at...",
-  "timestamp": "2026-04-14T21:52:27.938Z",
-  "retry_count": 1
-}
