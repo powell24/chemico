@@ -10,12 +10,12 @@ Derived from The Chemico Group's official website (thechemicogroup.com).
 
 | Name | Hex | Usage |
 |---|---|---|
-| Navy (Primary) | `#0A2342` | Sidebar, headings, nav, dark backgrounds |
-| Teal (Accent) | `#00B2A9` | Buttons, active states, links, badges, logo mark |
+| Brand Blue (Primary) | `#0071BC` | Sidebar, headings, buttons, nav, primary actions |
+| Teal (Accent) | `#00B2A9` | Active states, links, badges, highlights |
 | White | `#FFFFFF` | Page backgrounds, cards |
-| Light Gray | `#F4F6F8` | Subtle section backgrounds, table stripes |
-| Mid Gray | `#6B7280` | Body text, secondary labels |
-| Dark Gray | `#1F2937` | Primary body text |
+| Light Gray | `#F4F4F4` | Subtle section backgrounds, table stripes |
+| Near Black | `#111111` | Primary body text |
+| Mid Gray | `#808080` | Secondary labels, muted text |
 | Critical Red | `#DC2626` | Critical alerts, error states |
 | Warning Amber | `#D97706` | Warning alerts |
 | Info Blue | `#2563EB` | Info alerts, neutral badges |

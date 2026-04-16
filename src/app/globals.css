@@ -51,38 +51,38 @@
 :root {
   /* Chemico Brand */
   --background: oklch(1 0 0);                        /* White #FFFFFF */
-  --foreground: oklch(0.26 0.02 243);                /* Dark Gray #1F2937 */
+  --foreground: oklch(0.14 0 0);                     /* Near Black #111111 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.26 0.02 243);
+  --card-foreground: oklch(0.14 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.26 0.02 243);
-  --primary: oklch(0.17 0.07 243);                   /* Navy #0A2342 */
+  --popover-foreground: oklch(0.14 0 0);
+  --primary: oklch(0.52 0.15 240);                   /* Brand Blue #0071BC */
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0.005 243);                /* Light Gray #F4F6F8 */
-  --secondary-foreground: oklch(0.17 0.07 243);
-  --muted: oklch(0.96 0.005 243);                    /* Light Gray #F4F6F8 */
-  --muted-foreground: oklch(0.52 0.01 243);          /* Mid Gray #6B7280 */
+  --secondary: oklch(0.96 0 0);                      /* Light Gray #F4F4F4 */
+  --secondary-foreground: oklch(0.14 0 0);
+  --muted: oklch(0.96 0 0);                          /* Light Gray #F4F4F4 */
+  --muted-foreground: oklch(0.50 0 0);
   --accent: oklch(0.67 0.12 187);                    /* Teal #00B2A9 */
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.53 0.22 27);                /* Critical Red #DC2626 */
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.91 0.005 243);
-  --input: oklch(0.91 0.005 243);
-  --ring: oklch(0.67 0.12 187);                      /* Teal focus ring */
-  --chart-1: oklch(0.67 0.12 187);                   /* Teal */
-  --chart-2: oklch(0.17 0.07 243);                   /* Navy */
+  --border: oklch(0.91 0 0);
+  --input: oklch(0.91 0 0);
+  --ring: oklch(0.52 0.15 240);                      /* Brand Blue focus ring */
+  --chart-1: oklch(0.52 0.15 240);                   /* Brand Blue */
+  --chart-2: oklch(0.67 0.12 187);                   /* Teal */
   --chart-3: oklch(0.62 0.17 35);                    /* Amber */
   --chart-4: oklch(0.53 0.15 145);                   /* Green */
   --chart-5: oklch(0.53 0.22 27);                    /* Red */
   --radius: 0.5rem;
-  /* Sidebar — Navy background */
-  --sidebar: oklch(0.17 0.07 243);                   /* Navy #0A2342 */
+  /* Sidebar — Brand Blue background */
+  --sidebar: oklch(0.52 0.15 240);                   /* Brand Blue #0071BC */
   --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.67 0.12 187);           /* Teal */
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.22 0.07 243);            /* Slightly lighter navy */
+  --sidebar-accent: oklch(0.44 0.14 240);            /* Slightly darker blue */
   --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.25 0.06 243);
+  --sidebar-border: oklch(0.45 0.13 240);
   --sidebar-ring: oklch(0.67 0.12 187);
 }
 

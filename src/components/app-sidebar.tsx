@@ -8,6 +8,7 @@ import {
   FileText,
   MapPin,
   BarChart3,
+  Settings,
 } from "lucide-react"
 
 import {
@@ -53,6 +54,11 @@ const navItems = [
     label: "Reports",
     href: "/reports",
     icon: BarChart3,
+  },
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: Settings,
   },
 ]
 
