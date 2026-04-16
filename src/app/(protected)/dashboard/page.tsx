@@ -1,19 +1,40 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { getDashboardMetrics, getRecentAlerts, getSitesSummary } from "@/lib/supabase/queries/dashboard"
+import { KPICards } from "./_components/kpi-cards"
+import { RecentAlertsTable } from "./_components/recent-alerts-table"
+import { SiteComplianceList } from "./_components/site-compliance-list"
+import { ComplianceTrendChart } from "./_components/compliance-trend-chart"
 
-export default function DashboardPage() {
+interface Props {
+  searchParams: Promise<{ alerts_page?: string; sites_page?: string }>
+}
+
+export default async function DashboardPage({ searchParams }: Props) {
+  const params = await searchParams
+  const alertsPage = Math.max(1, Number(params.alerts_page) || 1)
+  const sitesPage  = Math.max(1, Number(params.sites_page)  || 1)
+
+  const [metrics, alertsResult, sitesResult] = await Promise.all([
+    getDashboardMetrics(),
+    getRecentAlerts(alertsPage, 8),
+    getSitesSummary(sitesPage, 10),
+  ])
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Compliance health overview across all sites</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Compliance health overview across all {metrics.totalSites} sites
+        </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-lg" />
-        ))}
-      </div>
-      <Skeleton className="h-64 rounded-lg" />
-      <Skeleton className="h-48 rounded-lg" />
+
+      <KPICards metrics={metrics} />
+
+      <ComplianceTrendChart />
+
+      <RecentAlertsTable result={alertsResult} />
+
+      <SiteComplianceList result={sitesResult} />
     </div>
   )
 }
