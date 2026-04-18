@@ -1,13 +1,40 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { createClient } from "@/lib/supabase/client"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+
+    router.push("/dashboard")
+    router.refresh()
+  }
+
   return (
     <div className="w-full max-w-md space-y-6">
       {/* Mobile-only logo */}
@@ -27,7 +54,7 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="space-y-5">
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
               <Input
@@ -35,31 +62,39 @@ export default function LoginPage() {
                 type="email"
                 placeholder="you@thechemicogroup.com"
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-accent hover:underline"
-                >
-                  Forgot password?
-                </Link>
               </div>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
                 autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
-          </div>
 
-          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-            Sign in
-          </Button>
+            {error && (
+              <p className="text-sm text-red-500">{error}</p>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              disabled={loading}
+            >
+              {loading ? "Signing in…" : "Sign in"}
+            </Button>
+          </form>
 
           <Separator />
 
