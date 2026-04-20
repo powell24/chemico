@@ -46,6 +46,11 @@ export async function getSessionMessages(sessionId: string): Promise<ChatMessage
   return (data ?? []) as ChatMessage[]
 }
 
+export async function updateSessionTitle(sessionId: string, title: string): Promise<void> {
+  const supabase = createClient()
+  await supabase.from("chat_sessions").update({ title }).eq("id", sessionId)
+}
+
 export async function saveMessage({
   sessionId,
   role,

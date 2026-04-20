@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import type { ChatMessage } from "@/lib/openai/build-messages"
-import { createSession, saveMessage } from "@/lib/supabase/queries/chat"
+import { createSession, saveMessage, updateSessionTitle } from "@/lib/supabase/queries/chat"
 
 export function useChat(initialSessionId: string | null = null) {
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId)
@@ -71,6 +71,18 @@ export function useChat(initialSessionId: string | null = null) {
       setStreamingContent(null)
 
       await saveMessage({ sessionId: activeSessionId, role: "assistant", content: assistantContent })
+
+      // Generate a summary title after the first exchange
+      if (!sessionId) {
+        fetch("/api/chat/title", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userInput, assistantResponse: assistantContent }),
+        })
+          .then((r) => r.json())
+          .then(({ title }) => updateSessionTitle(activeSessionId!, title))
+          .catch(() => {})
+      }
     } catch (err) {
       setError("Something went wrong. Please try again.")
       setStreamingContent(null)

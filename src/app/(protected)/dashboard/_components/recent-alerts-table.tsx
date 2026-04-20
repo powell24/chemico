@@ -1,8 +1,21 @@
+"use client"
+
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PaginationControl } from "./pagination-control"
-import type { RecentAlert, PaginatedResult } from "@/lib/supabase/queries/dashboard"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination"
+import type { RecentAlert } from "@/lib/supabase/queries/dashboard"
+
+const PAGE_SIZE = 8
 
 const CATEGORY_LABELS: Record<string, string> = {
   sds_missing:        "SDS Missing",
@@ -35,15 +48,29 @@ function relativeDate(dateStr: string) {
   return `${months}mo ago`
 }
 
-export function RecentAlertsTable({ result }: { result: PaginatedResult<RecentAlert> }) {
-  const { data: alerts, total, page, totalPages } = result
+function buildPages(page: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1)
+  const pages: (number | "ellipsis")[] = [1]
+  if (page > 3) pages.push("ellipsis")
+  for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i)
+  if (page < totalPages - 2) pages.push("ellipsis")
+  pages.push(totalPages)
+  return pages
+}
+
+export function RecentAlertsTable({ alerts }: { alerts: RecentAlert[] }) {
+  const [page, setPage] = useState(1)
+  const totalPages = Math.max(1, Math.ceil(alerts.length / PAGE_SIZE))
+  const paginated = alerts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const padRows = Math.max(0, PAGE_SIZE - paginated.length)
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold flex items-center justify-between">
           Recent Alerts
           <span className="text-xs font-normal text-muted-foreground">
-            {total} open
+            {alerts.length} open
           </span>
         </CardTitle>
       </CardHeader>
@@ -59,7 +86,7 @@ export function RecentAlertsTable({ result }: { result: PaginatedResult<RecentAl
             </TableRow>
           </TableHeader>
           <TableBody>
-            {alerts.map((alert) => (
+            {paginated.map((alert) => (
               <TableRow key={alert.id} className="text-sm">
                 <TableCell className="pl-6">
                   <SeverityBadge severity={alert.severity} />
@@ -80,18 +107,62 @@ export function RecentAlertsTable({ result }: { result: PaginatedResult<RecentAl
                 </TableCell>
               </TableRow>
             ))}
-            {alerts.length === 0 && (
+            {paginated.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-muted-foreground py-8 text-sm">
                   No open alerts
                 </TableCell>
               </TableRow>
             )}
+            {Array.from({ length: padRows }).map((_, i) => (
+              <TableRow key={`pad-${i}`} className="pointer-events-none" aria-hidden="true">
+                <TableCell className="pl-6">
+                  <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium invisible">x</span>
+                </TableCell>
+                <TableCell colSpan={4} />
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
-        <div className="px-6 pb-4">
-          <PaginationControl page={page} totalPages={totalPages} paramKey="alerts_page" />
-        </div>
+        {totalPages > 1 && (
+          <div className="px-6 pb-4">
+            <Pagination className="mt-4">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => page > 1 && setPage((p) => p - 1)}
+                    aria-disabled={page <= 1}
+                    className={page <= 1 ? "pointer-events-none opacity-50 cursor-default" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {buildPages(page, totalPages).map((p, i) =>
+                  p === "ellipsis" ? (
+                    <PaginationItem key={`ellipsis-${i}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        isActive={p === page}
+                        onClick={() => setPage(p as number)}
+                        className="cursor-pointer"
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => page < totalPages && setPage((p) => p + 1)}
+                    aria-disabled={page >= totalPages}
+                    className={page >= totalPages ? "pointer-events-none opacity-50 cursor-default" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

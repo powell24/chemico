@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
     (c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token")
   )
 
-  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/signup")
+  const isAuthRoute = pathname.startsWith("/login")
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/copilot") ||

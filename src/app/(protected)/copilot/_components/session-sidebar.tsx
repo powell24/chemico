@@ -54,14 +54,16 @@ export function SessionSidebar({
             <button
               key={session.id}
               onClick={() => onSelectSession(session.id)}
-              className={`w-full text-left rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted group ${
-                activeSessionId === session.id ? "bg-muted font-medium" : ""
+              className={`w-full text-left rounded-md px-3 py-2 text-sm transition-colors group ${
+                activeSessionId === session.id
+                  ? "bg-background border border-border shadow-sm font-medium"
+                  : "hover:bg-muted"
               }`}
             >
               <div className="flex items-start gap-2 min-w-0">
-                <MessageSquare className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
+                <MessageSquare className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${activeSessionId === session.id ? "text-primary" : "text-muted-foreground"}`} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs leading-relaxed">{session.title}</p>
+                  <p className={`truncate text-xs leading-relaxed ${activeSessionId === session.id ? "text-foreground" : ""}`}>{session.title}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
                     {relativeDate(session.updated_at)}
                   </p>

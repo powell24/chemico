@@ -78,62 +78,37 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   }
 }
 
-export type PaginatedResult<T> = {
-  data: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
-}
 
-export async function getRecentAlerts(
-  page = 1,
-  pageSize = 8
-): Promise<PaginatedResult<RecentAlert>> {
+export async function getRecentAlerts(): Promise<RecentAlert[]> {
   const supabase = await createClient()
-  const offset = (page - 1) * pageSize
 
-  const [{ data, count }] = await Promise.all([
-    supabase
-      .from("compliance_alerts")
-      .select("id, severity, category, title, description, status, created_at, sites(name, city, state)", { count: "exact" })
-      .eq("status", "open")
-      .order("severity", { ascending: true })
-      .order("created_at", { ascending: false })
-      .range(offset, offset + pageSize - 1),
-  ])
+  const { data } = await supabase
+    .from("compliance_alerts")
+    .select("id, severity, category, title, description, status, created_at, sites(name, city, state)")
+    .eq("status", "open")
+    .order("severity", { ascending: true })
+    .order("created_at", { ascending: false })
 
-  const alerts = (data ?? []).map((alert) => ({
+  return (data ?? []).map((alert) => ({
     ...alert,
     severity: alert.severity as RecentAlert["severity"],
     site: Array.isArray(alert.sites)
       ? (alert.sites[0] as { name: string; city: string; state: string } | undefined) ?? null
       : (alert.sites as unknown as { name: string; city: string; state: string } | null) ?? null,
   }))
-
-  const total = count ?? 0
-  return { data: alerts, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
 }
 
-export async function getSitesSummary(
-  page = 1,
-  pageSize = 10
-): Promise<PaginatedResult<SiteSummary>> {
+export async function getSitesSummary(): Promise<SiteSummary[]> {
   const supabase = await createClient()
-  const offset = (page - 1) * pageSize
 
-  const { data, count } = await supabase
+  const { data } = await supabase
     .from("sites")
-    .select("id, name, city, state, country, industry, compliance_score, status", { count: "exact" })
+    .select("id, name, city, state, country, industry, compliance_score, status")
     .order("compliance_score", { ascending: true })
-    .range(offset, offset + pageSize - 1)
 
-  const sites = (data ?? []).map((s) => ({
+  return (data ?? []).map((s) => ({
     ...s,
     compliance_score: s.compliance_score ?? 0,
     status: s.status as SiteSummary["status"],
   }))
-
-  const total = count ?? 0
-  return { data: sites, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
 }

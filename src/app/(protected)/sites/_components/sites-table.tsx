@@ -5,8 +5,26 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination"
 import type { Site } from "@/lib/supabase/queries/sites"
+
+function buildPages(page: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1)
+  const pages: (number | "ellipsis")[] = [1]
+  if (page > 3) pages.push("ellipsis")
+  for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i)
+  if (page < totalPages - 2) pages.push("ellipsis")
+  pages.push(totalPages)
+  return pages
+}
 
 const STATUS_LABEL: Record<Site["status"], string> = {
   compliant: "Compliant",
@@ -139,29 +157,43 @@ export function SitesTable({ sites, onSiteSelect }: Props) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-center gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-xs text-muted-foreground">
-          {page} / {totalPages}
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      {totalPages > 1 && (
+        <Pagination className="mt-1">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => page > 1 && setPage((p) => p - 1)}
+                aria-disabled={page <= 1}
+                className={page <= 1 ? "pointer-events-none opacity-50 cursor-default" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            {buildPages(page, totalPages).map((p, i) =>
+              p === "ellipsis" ? (
+                <PaginationItem key={`ellipsis-${i}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={p}>
+                  <PaginationLink
+                    isActive={p === page}
+                    onClick={() => setPage(p as number)}
+                    className="cursor-pointer"
+                  >
+                    {p}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            )}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => page < totalPages && setPage((p) => p + 1)}
+                aria-disabled={page >= totalPages}
+                className={page >= totalPages ? "pointer-events-none opacity-50 cursor-default" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   )
 }

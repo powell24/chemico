@@ -4,19 +4,11 @@ import { RecentAlertsTable } from "./_components/recent-alerts-table"
 import { SiteComplianceList } from "./_components/site-compliance-list"
 import { ComplianceTrendChart } from "./_components/compliance-trend-chart"
 
-interface Props {
-  searchParams: Promise<{ alerts_page?: string; sites_page?: string }>
-}
-
-export default async function DashboardPage({ searchParams }: Props) {
-  const params = await searchParams
-  const alertsPage = Math.max(1, Number(params.alerts_page) || 1)
-  const sitesPage  = Math.max(1, Number(params.sites_page)  || 1)
-
-  const [metrics, alertsResult, sitesResult] = await Promise.all([
+export default async function DashboardPage() {
+  const [metrics, alerts, sites] = await Promise.all([
     getDashboardMetrics(),
-    getRecentAlerts(alertsPage, 8),
-    getSitesSummary(sitesPage, 10),
+    getRecentAlerts(),
+    getSitesSummary(),
   ])
 
   return (
@@ -32,9 +24,9 @@ export default async function DashboardPage({ searchParams }: Props) {
 
       <ComplianceTrendChart />
 
-      <RecentAlertsTable result={alertsResult} />
+      <RecentAlertsTable alerts={alerts} />
 
-      <SiteComplianceList result={sitesResult} />
+      <SiteComplianceList sites={sites} />
     </div>
   )
 }
