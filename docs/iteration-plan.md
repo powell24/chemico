@@ -1,6 +1,6 @@
 # Chemico Compliance Copilot — Iteration Plan
 
-Last updated: 2026-04-15
+Last updated: 2026-04-20
 
 ## Overview
 
@@ -78,27 +78,25 @@ Last updated: 2026-04-15
 
 ## Iteration 4 — AI Copilot Chat
 
-**Status:** Pending
+**Status:** Done
 
-- Route: `src/app/api/chat/route.ts` with `export const runtime = 'nodejs'`
-- `buildMessages({ history, userInput, ragChunks? })` — pure function, ragChunks optional (seam for Iteration 5)
-- Claude `claude-sonnet-4-6` streaming via Anthropic SDK; return `stream.toReadableStream()`
-- Chat UI via shadcn blocks; session list sidebar; streaming message display
-- Chemico compliance system prompt
-- Chat sessions persisted to Supabase
+- OpenAI `gpt-4o-mini` streaming chat via `/api/chat` edge route
+- `buildMessages({ history, userInput, ragChunks? })` — pure function with RAG seam
+- Session list sidebar; streaming message display; session persistence via Supabase
+- Chemico compliance system prompt with document inventory injection
+- Cookie-based auth middleware protecting all `(protected)` routes
 
 ---
 
 ## Iteration 5 — Document Library + RAG
 
-**Status:** Pending
+**Status:** Done
 
-- Document table UI with filters (type, site, status)
+- Document table UI with filters (type, site, status), pagination, and detail sheet
 - `scripts/embed.ts` — local Node one-shot script to chunk + embed seeded docs into pgvector
-- OpenAI `text-embedding-3-small` for embeddings
-- `RAG_ENABLED` env flag — when false or retrieval throws, calls `buildMessages` without `ragChunks`
-- Wire retrieved chunks into `buildMessages` — no UI rework needed
-- Citation display in chat responses
+- OpenAI `text-embedding-3-small` embeddings; `match_document_chunks` Supabase RPC
+- `RAG_ENABLED` env flag — graceful fallback when disabled or retrieval fails
+- RAG chunks injected into `buildMessages`; assistant bubbles styled as white cards
 
 ---
 
@@ -138,15 +136,15 @@ RAG_ENABLED=false
 
 ## Key Decisions
 
-| Decision          | Choice                                  | Reason                                          |
-| ----------------- | --------------------------------------- | ----------------------------------------------- |
-| Package manager   | pnpm                                    | Faster than npm                                 |
-| UI components     | shadcn/ui only (core + registry blocks) | Consistency, no custom components               |
-| Font              | Inter                                   | Matches Chemico website                         |
-| Color space       | OKLCH                                   | Tailwind v4 default                             |
-| LLM               | OpenAI `gpt-4o-mini`                    | Cost-effective, fast, live non-deterministic    |
-| Embeddings        | OpenAI `text-embedding-3-small`         | Cheapest, fast, 1536 dimensions                 |
-| RAG retrieval     | pgvector + HNSW index                   | Built into Supabase, no extra service           |
-| Auth credentials  | Anon key only — no service role key     | Security-first; seed data via SQL Editor        |
-| Route group       | `(protected)`                           | Matches PRD spec                                |
-| Chunking script   | Local Node `scripts/embed.ts`           | One-shot for demo seeding                       |
+| Decision         | Choice                                  | Reason                                       |
+| ---------------- | --------------------------------------- | -------------------------------------------- |
+| Package manager  | pnpm                                    | Faster than npm                              |
+| UI components    | shadcn/ui only (core + registry blocks) | Consistency, no custom components            |
+| Font             | Inter                                   | Matches Chemico website                      |
+| Color space      | OKLCH                                   | Tailwind v4 default                          |
+| LLM              | OpenAI `gpt-4o-mini`                    | Cost-effective, fast, live non-deterministic |
+| Embeddings       | OpenAI `text-embedding-3-small`         | Cheapest, fast, 1536 dimensions              |
+| RAG retrieval    | pgvector + HNSW index                   | Built into Supabase, no extra service        |
+| Auth credentials | Anon key only — no service role key     | Security-first; seed data via SQL Editor     |
+| Route group      | `(protected)`                           | Matches PRD spec                             |
+| Chunking script  | Local Node `scripts/embed.ts`           | One-shot for demo seeding                    |
