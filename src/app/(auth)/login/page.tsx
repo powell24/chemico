@@ -40,16 +40,16 @@ export default function LoginPage() {
       {/* Mobile-only logo */}
       <div className="flex items-center gap-3 lg:hidden">
         <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-sm">C</span>
+          <span className="text-primary-foreground font-bold text-sm">A</span>
         </div>
-        <span className="text-lg font-bold text-primary">Chemico Group</span>
+        <span className="text-lg font-bold text-primary">Aria</span>
       </div>
 
       <Card className="shadow-md">
         <CardHeader className="space-y-1 pb-4">
           <CardTitle className="text-2xl font-bold text-foreground">Welcome back</CardTitle>
           <CardDescription>
-            Sign in to your Compliance Copilot account
+            Sign in to your Aria account
           </CardDescription>
         </CardHeader>
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
       </Card>
 
       <p className="text-center text-xs text-muted-foreground">
-        By signing in you agree to Chemico&apos;s{" "}
+        By signing in you agree to Aria&apos;s{" "}
         <span className="underline cursor-pointer">Terms of Service</span>
         {" "}and{" "}
         <span className="underline cursor-pointer">Privacy Policy</span>.

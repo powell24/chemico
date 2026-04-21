@@ -8,6 +8,7 @@ export function middleware(request: NextRequest) {
   )
 
   const isAuthRoute = pathname.startsWith("/login")
+  const isRootRoute = pathname === "/"
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/copilot") ||
@@ -15,6 +16,12 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/sites") ||
     pathname.startsWith("/reports") ||
     pathname.startsWith("/settings")
+
+  if (isRootRoute) {
+    return NextResponse.redirect(
+      new URL(hasSession ? "/dashboard" : "/login", request.url)
+    )
+  }
 
   if (!hasSession && isProtectedRoute) {
     return NextResponse.redirect(new URL("/login", request.url))

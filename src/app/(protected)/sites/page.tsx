@@ -13,7 +13,7 @@ export default async function SitesPage() {
       <div>
         <h1 className="text-2xl font-bold text-primary">Sites</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Compliance status across {sites.length} Chemico locations
+          Compliance status across {sites.length} managed locations
         </p>
       </div>
 

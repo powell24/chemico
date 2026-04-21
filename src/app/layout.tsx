@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Chemico Compliance Copilot",
+  title: "Aria",
   description: "AI-powered compliance & SDS intelligence for The Chemico Group",
 };
 

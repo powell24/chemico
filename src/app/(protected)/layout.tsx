@@ -11,7 +11,7 @@ export default function ProtectedLayout({
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center border-b border-border bg-background px-6">
-          <span className="text-sm text-muted-foreground">The Chemico Group</span>
+          <span className="text-sm text-muted-foreground">Aria</span>
         </header>
         <main className="flex-1 bg-muted p-6 [contain:paint_layout]">
           {children}

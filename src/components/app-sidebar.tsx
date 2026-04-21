@@ -107,7 +107,7 @@ export function AppSidebar() {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col overflow-hidden flex-1">
-            <span className="text-xs font-medium text-sidebar-foreground leading-none">Chemico Group</span>
+            <span className="text-xs font-medium text-sidebar-foreground leading-none">The Chemico Group</span>
             <span className="text-xs text-sidebar-foreground/50 leading-none mt-0.5">EH&S Team</span>
           </div>
         </div>

@@ -73,7 +73,7 @@ export function MessageList({ messages, streamingContent, isLoading }: MessageLi
           <span className="text-2xl">⚗️</span>
         </div>
         <div>
-          <p className="font-medium text-sm">Chemico Compliance Copilot</p>
+          <p className="font-medium text-sm">Aria</p>
           <p className="text-xs text-muted-foreground mt-1">
             Ask me about SDS sheets, compliance regulations, site audits, or chemical handling requirements.
           </p>

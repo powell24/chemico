@@ -28,9 +28,9 @@ export default function AuthLayout({
         {/* Logo */}
         <div className="relative flex items-center gap-3 anim-logo">
           <div className="h-9 w-9 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center backdrop-blur-sm">
-            <span className="text-white font-bold text-sm">C</span>
+            <span className="text-white font-bold text-sm">A</span>
           </div>
-          <span className="text-xl font-bold tracking-tight">Chemico Group</span>
+          <span className="text-xl font-bold tracking-tight">Aria</span>
         </div>
 
         {/* Headline + stats */}

@@ -33,7 +33,7 @@ export function SignOutButton() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Sign out of Chemico?</DialogTitle>
+            <DialogTitle>Sign out of Aria?</DialogTitle>
             <DialogDescription>
               Your session will be ended and you'll be redirected to the login page.
             </DialogDescription>
