@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DocumentDetailSheet } from "./document-detail-sheet"
-import { PaginationControl } from "@/app/(protected)/dashboard/_components/pagination-control"
-import type { Document, PaginatedDocuments } from "@/lib/supabase/queries/documents"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination"
+import type { Document } from "@/lib/supabase/queries/documents"
 
 const TYPE_LABELS: Record<string, string> = {
   sds: "SDS", msds: "MSDS", sop: "SOP", regulation: "Regulation", regulatory: "Regulatory", audit: "Audit", training: "Training",
@@ -33,12 +33,15 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 interface DocumentTableProps {
-  result: PaginatedDocuments
+  documents: Document[]
+  total: number
+  page: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }
 
-export function DocumentTable({ result }: DocumentTableProps) {
+export function DocumentTable({ documents, total, page, totalPages, onPageChange }: DocumentTableProps) {
   const [selected, setSelected] = useState<Document | null>(null)
-  const { data: documents, total, page, totalPages } = result
 
   return (
     <>
@@ -92,14 +95,64 @@ export function DocumentTable({ result }: DocumentTableProps) {
                   </TableCell>
                 </TableRow>
               )}
+              {Array.from({ length: Math.max(0, 12 - documents.length) }).map((_, i) => (
+                <TableRow key={`pad-${i}`} className="pointer-events-none" aria-hidden="true">
+                  <TableCell className="pl-6">
+                    <p className="font-medium truncate max-w-xs invisible">x</p>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium invisible">x</span>
+                  </TableCell>
+                  <TableCell colSpan={3} />
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
-          <div className="px-6 pb-4">
-            <div className="flex items-center justify-between pt-2">
-              <p className="text-xs text-muted-foreground">{total} documents</p>
-              <PaginationControl page={page} totalPages={totalPages} paramKey="page" />
+          {totalPages > 1 && (
+            <div className="pb-4 pt-2 flex items-center justify-center">
+              {totalPages > 1 && (
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => page > 1 && onPageChange(page - 1)}
+                        aria-disabled={page <= 1}
+                        className={page <= 1 ? "pointer-events-none opacity-50 cursor-default" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    {(() => {
+                      const pages: (number | "ellipsis")[] = []
+                      if (totalPages <= 5) {
+                        for (let i = 1; i <= totalPages; i++) pages.push(i)
+                      } else {
+                        pages.push(1)
+                        if (page > 3) pages.push("ellipsis")
+                        for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i)
+                        if (page < totalPages - 2) pages.push("ellipsis")
+                        pages.push(totalPages)
+                      }
+                      return pages.map((p, i) =>
+                        p === "ellipsis" ? (
+                          <PaginationItem key={`e-${i}`}><PaginationEllipsis /></PaginationItem>
+                        ) : (
+                          <PaginationItem key={p}>
+                            <PaginationLink isActive={p === page} onClick={() => onPageChange(p as number)} className="cursor-pointer">{p}</PaginationLink>
+                          </PaginationItem>
+                        )
+                      )
+                    })()}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => page < totalPages && onPageChange(page + 1)}
+                        aria-disabled={page >= totalPages}
+                        className={page >= totalPages ? "pointer-events-none opacity-50 cursor-default" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 

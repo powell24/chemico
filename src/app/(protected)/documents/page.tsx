@@ -1,23 +1,9 @@
-import { getDocuments, getSitesForFilter, getDocumentCounts } from "@/lib/supabase/queries/documents"
-import { DocumentTable } from "./_components/document-table"
-import { DocumentFilters } from "./_components/document-filters"
+import { getAllDocuments, getSitesForFilter, getDocumentCounts } from "@/lib/supabase/queries/documents"
+import { DocumentsShell } from "./_components/documents-shell"
 
-interface Props {
-  searchParams: Promise<{ doc_type?: string; site_id?: string; status?: string; page?: string }>
-}
-
-export default async function DocumentsPage({ searchParams }: Props) {
-  const params = await searchParams
-  const page = Math.max(1, Number(params.page) || 1)
-
-  const [result, sites, counts] = await Promise.all([
-    getDocuments({
-      doc_type: params.doc_type,
-      site_id: params.site_id,
-      status: params.status,
-      page,
-      pageSize: 12,
-    }),
+export default async function DocumentsPage() {
+  const [documents, sites, counts] = await Promise.all([
+    getAllDocuments(),
     getSitesForFilter(),
     getDocumentCounts(),
   ])
@@ -31,15 +17,7 @@ export default async function DocumentsPage({ searchParams }: Props) {
         </p>
       </div>
 
-      <DocumentFilters
-        sites={sites}
-        counts={counts}
-        currentType={params.doc_type ?? ""}
-        currentSiteId={params.site_id ?? ""}
-        currentStatus={params.status ?? ""}
-      />
-
-      <DocumentTable result={result} />
+      <DocumentsShell documents={documents} sites={sites} counts={counts} />
     </div>
   )
 }

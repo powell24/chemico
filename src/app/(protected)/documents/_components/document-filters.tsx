@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { DocumentCounts } from "@/lib/supabase/queries/documents"
 
@@ -26,24 +25,21 @@ interface DocumentFiltersProps {
   currentType: string
   currentSiteId: string
   currentStatus: string
+  onTypeChange: (value: string) => void
+  onSiteChange: (value: string) => void
+  onStatusChange: (value: string) => void
 }
 
-export function DocumentFilters({ sites, counts, currentType, currentSiteId, currentStatus }: DocumentFiltersProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  function update(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString())
-    if (value === "all") {
-      params.delete(key)
-    } else {
-      params.set(key, value)
-    }
-    params.delete("page")
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
-  }
-
+export function DocumentFilters({
+  sites,
+  counts,
+  currentType,
+  currentSiteId,
+  currentStatus,
+  onTypeChange,
+  onSiteChange,
+  onStatusChange,
+}: DocumentFiltersProps) {
   const typeLabel = TYPES.find((t) => t.value === currentType)?.label ?? "All Document Types"
   const siteLabel = sites.find((s) => s.id === currentSiteId)?.name ?? "All Sites"
   const statusLabel = STATUSES.find((s) => s.value === currentStatus)?.label ?? "All Statuses"
@@ -52,7 +48,7 @@ export function DocumentFilters({ sites, counts, currentType, currentSiteId, cur
     <div className="flex flex-wrap gap-4">
       <div className="flex flex-col gap-1">
         <span className="text-xs font-medium text-muted-foreground">Document Type</span>
-        <Select value={currentType || "all"} onValueChange={(v) => update("doc_type", v ?? "all")}>
+        <Select value={currentType || "all"} onValueChange={(v) => onTypeChange(v ?? "all")}>
           <SelectTrigger className="w-72 h-9 text-sm">
             <SelectValue>{typeLabel}</SelectValue>
           </SelectTrigger>
@@ -69,7 +65,7 @@ export function DocumentFilters({ sites, counts, currentType, currentSiteId, cur
 
       <div className="flex flex-col gap-1">
         <span className="text-xs font-medium text-muted-foreground">Site Name</span>
-        <Select value={currentSiteId || "all"} onValueChange={(v) => update("site_id", v ?? "all")}>
+        <Select value={currentSiteId || "all"} onValueChange={(v) => onSiteChange(v ?? "all")}>
           <SelectTrigger className="w-64 h-9 text-sm">
             <SelectValue>{siteLabel}</SelectValue>
           </SelectTrigger>
@@ -100,7 +96,7 @@ export function DocumentFilters({ sites, counts, currentType, currentSiteId, cur
 
       <div className="flex flex-col gap-1">
         <span className="text-xs font-medium text-muted-foreground">Status</span>
-        <Select value={currentStatus || "all"} onValueChange={(v) => update("status", v ?? "all")}>
+        <Select value={currentStatus || "all"} onValueChange={(v) => onStatusChange(v ?? "all")}>
           <SelectTrigger className="w-48 h-9 text-sm">
             <SelectValue>{statusLabel}</SelectValue>
           </SelectTrigger>

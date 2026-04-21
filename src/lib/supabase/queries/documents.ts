@@ -80,6 +80,23 @@ export async function getDocumentList(): Promise<{ filename: string; doc_type: s
   })
 }
 
+export async function getAllDocuments(): Promise<Document[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("documents")
+    .select("id, filename, doc_type, status, storage_path, page_count, created_at, updated_at, sites(id, name, city, state)")
+    .order("updated_at", { ascending: false })
+
+  return (data ?? []).map((d) => ({
+    ...d,
+    doc_type: d.doc_type as Document["doc_type"],
+    status: d.status as Document["status"],
+    site: Array.isArray(d.sites)
+      ? (d.sites[0] as Document["site"] | undefined) ?? null
+      : (d.sites as unknown as Document["site"]) ?? null,
+  }))
+}
+
 export async function getSitesForFilter(): Promise<{ id: string; name: string }[]> {
   return withCache(CACHE_KEYS.sitesForFilter, TTL.documents, async () => {
     const supabase = await createClient()

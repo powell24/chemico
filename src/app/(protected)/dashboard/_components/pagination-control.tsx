@@ -14,10 +14,11 @@ import {
 interface PaginationControlProps {
   page: number
   totalPages: number
-  paramKey: string
+  paramKey?: string
+  onNavigate?: (page: number) => void
 }
 
-export function PaginationControl({ page, totalPages, paramKey }: PaginationControlProps) {
+export function PaginationControl({ page, totalPages, paramKey, onNavigate }: PaginationControlProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -25,8 +26,9 @@ export function PaginationControl({ page, totalPages, paramKey }: PaginationCont
   if (totalPages <= 1) return null
 
   function navigate(p: number) {
+    if (onNavigate) { onNavigate(p); return }
     const params = new URLSearchParams(searchParams.toString())
-    params.set(paramKey, String(p))
+    params.set(paramKey!, String(p))
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
