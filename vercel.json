@@ -1,0 +1,9 @@
+{
+  "regions": ["sin", "syd"],
+  "functions": {
+    "src/app/api/**": {
+      "maxDuration": 300,
+      "memory": 1024
+    }
+  }
+}

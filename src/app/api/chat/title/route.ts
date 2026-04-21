@@ -1,5 +1,7 @@
 import { openai } from "@/lib/openai/client"
 
+export const maxDuration = 300
+
 export async function POST(request: Request) {
   const { userInput, assistantResponse } = (await request.json()) as {
     userInput: string

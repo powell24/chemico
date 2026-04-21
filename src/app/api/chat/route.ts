@@ -1,4 +1,6 @@
 import { openai } from "@/lib/openai/client"
+
+export const maxDuration = 300
 import { buildMessages } from "@/lib/openai/build-messages"
 import { retrieveChunks } from "@/lib/supabase/queries/rag"
 import { getDocumentList } from "@/lib/supabase/queries/documents"
