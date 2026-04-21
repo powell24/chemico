@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { withCache, CACHE_KEYS, TTL } from "@/lib/cache/redis"
 
 export type Report = {
   id: string
@@ -11,17 +12,19 @@ export type Report = {
 }
 
 export async function getReports(): Promise<Report[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from("reports")
-    .select("id, report_type, title, period_start, period_end, status, created_at")
-    .order("created_at", { ascending: false })
+  return withCache(CACHE_KEYS.reports, TTL.reports, async () => {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from("reports")
+      .select("id, report_type, title, period_start, period_end, status, created_at")
+      .order("created_at", { ascending: false })
 
-  return (data ?? []).map((r) => ({
-    ...r,
-    report_type: r.report_type as Report["report_type"],
-    status: r.status as Report["status"],
-  }))
+    return (data ?? []).map((r) => ({
+      ...r,
+      report_type: r.report_type as Report["report_type"],
+      status:      r.status as Report["status"],
+    }))
+  })
 }
 
 export type SiteScoreSample = {
@@ -30,15 +33,17 @@ export type SiteScoreSample = {
 }
 
 export async function getBottomSites(limit = 10): Promise<SiteScoreSample[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from("sites")
-    .select("name, compliance_score")
-    .order("compliance_score", { ascending: true })
-    .limit(limit)
+  return withCache(CACHE_KEYS.bottomSites(limit), TTL.sites, async () => {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from("sites")
+      .select("name, compliance_score")
+      .order("compliance_score", { ascending: true })
+      .limit(limit)
 
-  return (data ?? []).map((s) => ({
-    name: s.name.replace(/ (Automotive|Aerospace|Electronics|Biopharma|Defense|Manufacturing|Distribution|Industrial|Chemical|Government|Research|Operations|Campus|Center|Hub|Plant|Lab|Works|Depot|Base|Facility|Complex|Park|Division|Services|Institute).*/, ""),
-    score: s.compliance_score ?? 0,
-  }))
+    return (data ?? []).map((s) => ({
+      name: s.name.replace(/ (Automotive|Aerospace|Electronics|Biopharma|Defense|Manufacturing|Distribution|Industrial|Chemical|Government|Research|Operations|Campus|Center|Hub|Plant|Lab|Works|Depot|Base|Facility|Complex|Park|Division|Services|Institute).*/, ""),
+      score: s.compliance_score ?? 0,
+    }))
+  })
 }
