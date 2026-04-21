@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import {
   LayoutDashboard,
   Bot,
@@ -9,7 +10,6 @@ import {
   MapPin,
   BarChart3,
   Settings,
-  FlaskConical,
 } from "lucide-react"
 
 import {
@@ -48,10 +48,11 @@ export function AppSidebar() {
         {/* Expanded layout */}
         <div className="flex items-center justify-between gap-2 group-data-[state=collapsed]:hidden">
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="h-8 w-8 rounded-full border border-sidebar-border bg-sidebar-primary flex items-center justify-center shrink-0">
-              <FlaskConical className="h-4 w-4 text-white" />
+            <Image src="/chemico_logo.png" alt="Chemico" width={32} height={32} className="shrink-0 rounded-lg p-1 bg-white" />
+            <div className="flex flex-col leading-none">
+              <span className="text-sm font-semibold text-white">Aria</span>
+              <span className="text-[10px] text-sidebar-foreground/50 mt-0.5">Compliance Copilot</span>
             </div>
-            <span className="text-xs text-white leading-none">Compliance Copilot</span>
           </div>
           <SidebarTrigger
             className="shrink-0 cursor-pointer text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
@@ -64,9 +65,7 @@ export function AppSidebar() {
             className="shrink-0 cursor-pointer text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
             title="Toggle Sidebar"
           />
-          <div className="h-8 w-8 rounded-full border border-sidebar-border bg-sidebar-primary flex items-center justify-center">
-            <FlaskConical className="h-4 w-4 text-white" />
-          </div>
+          <Image src="/chemico_logo.png" alt="Chemico" width={32} height={32} className="shrink-0 rounded-lg p-1 bg-white" />
         </div>
       </SidebarHeader>
 

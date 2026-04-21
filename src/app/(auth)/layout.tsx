@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { ParticleBackground } from "./_components/particle-background"
 
 export default function AuthLayout({
@@ -27,9 +28,7 @@ export default function AuthLayout({
 
         {/* Logo */}
         <div className="relative flex items-center gap-3 anim-logo">
-          <div className="h-9 w-9 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center backdrop-blur-sm">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
+          <Image src="/chemico_logo.png" alt="Chemico" width={36} height={36} className="rounded-lg p-1 bg-white" />
           <span className="text-xl font-bold tracking-tight">Aria</span>
         </div>
 

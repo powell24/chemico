@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -39,9 +40,7 @@ export default function LoginPage() {
     <div className="w-full max-w-md space-y-6">
       {/* Mobile-only logo */}
       <div className="flex items-center gap-3 lg:hidden">
-        <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-sm">A</span>
-        </div>
+        <Image src="/chemico_logo.png" alt="Chemico" width={32} height={32} className="rounded-lg p-1 bg-white" />
         <span className="text-lg font-bold text-primary">Aria</span>
       </div>
 
