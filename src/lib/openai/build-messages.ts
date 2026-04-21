@@ -14,9 +14,16 @@ Only refuse if a question is completely unrelated to The Chemico Group, its oper
 
 Guidelines:
 - Be concise and specific. Reference regulations by name when relevant.
-- When you don't have specific document data, say so clearly rather than guessing.
+- When answering from retrieved documents, always cite the source document name.
+- If no relevant documents exist for a question, clearly state that no documents in the library address this topic.
 - Prioritize actionable guidance over general information.
-- Format responses with clear structure when answering multi-part questions.`
+- Format responses with clear structure when answering multi-part questions.
+
+At the end of every response, suggest 2–3 concise follow-up questions written from the user's perspective — phrased as if the user is asking them, not as if you are offering them. Place them at the very end, formatted exactly like this:
+<followups>
+Which sites have the most overdue documents?
+How do I file a Tier II report for Houston?
+</followups>`
 
 export type ChatMessage = {
   role: "user" | "assistant"
@@ -25,15 +32,50 @@ export type ChatMessage = {
 
 export type DocumentListItem = { filename: string; doc_type: string; status: string; site: string | null }
 
+export type AlertContext = {
+  severity: "critical" | "warning" | "info"
+  title: string
+  description: string
+  site: string | null
+}
+
+export type SiteContext = {
+  name: string
+  city: string
+  state: string
+  compliance_score: number
+  status: string
+}
+
+type RagChunkInput = { content: string; filename: string }
+
 export type BuildMessagesInput = {
   history: ChatMessage[]
   userInput: string
-  ragChunks?: string[]
+  ragChunks?: RagChunkInput[]
   documentList?: DocumentListItem[]
+  alerts?: AlertContext[]
+  sites?: SiteContext[]
 }
 
-export function buildMessages({ history, userInput, ragChunks, documentList }: BuildMessagesInput): ChatCompletionMessageParam[] {
+export function buildMessages({ history, userInput, ragChunks, documentList, alerts, sites }: BuildMessagesInput): ChatCompletionMessageParam[] {
   let systemContent = SYSTEM_PROMPT
+
+  if (sites && sites.length > 0) {
+    const lines = sites.map((s) =>
+      `- ${s.name}, ${s.city}, ${s.state} — score: ${s.compliance_score}, status: ${s.status}`
+    )
+    systemContent += `\n\nSites (${sites.length} total):\n${lines.join("\n")}`
+  }
+
+  if (alerts && alerts.length > 0) {
+    const lines = alerts.map((a) =>
+      `- [${a.severity.toUpperCase()}]${a.site ? ` ${a.site}` : ""} — ${a.title}: ${a.description}`
+    )
+    systemContent += `\n\nOpen compliance alerts (${alerts.length} total):\n${lines.join("\n")}`
+  } else if (alerts) {
+    systemContent += `\n\nOpen compliance alerts: None currently open.`
+  }
 
   if (documentList && documentList.length > 0) {
     const lines = documentList.map((d) =>
@@ -43,7 +85,8 @@ export function buildMessages({ history, userInput, ragChunks, documentList }: B
   }
 
   if (ragChunks && ragChunks.length > 0) {
-    systemContent += `\n\nRelevant document excerpts:\n${ragChunks.join("\n\n")}\n\nAnswer using these excerpts where relevant. Cite the source document name when referencing specific information.`
+    const formatted = ragChunks.map((c) => `[Source: ${c.filename}]\n${c.content}`)
+    systemContent += `\n\nRelevant document excerpts:\n${formatted.join("\n\n")}\n\nAnswer using these excerpts where relevant. Always cite the source document name when referencing specific information.`
   }
 
   return [

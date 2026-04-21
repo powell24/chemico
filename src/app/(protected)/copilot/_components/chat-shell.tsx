@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
+import { CornerDownRight } from "lucide-react"
 import { SessionSidebar } from "./session-sidebar"
 import { MessageList } from "./message-list"
 import { MessageInput } from "./message-input"
 import { useChat } from "@/hooks/use-chat"
-import { getSessions, getSessionMessages } from "@/lib/supabase/queries/chat"
+import { getSessions, getSessionMessages, deleteSession } from "@/lib/supabase/queries/chat"
 import type { ChatSession } from "@/lib/supabase/queries/chat"
 
 const PROMPT_SUGGESTIONS = [
@@ -18,6 +19,12 @@ const PROMPT_SUGGESTIONS = [
 const STORAGE_KEY = "copilot_session_id"
 let hasInitialized = false
 
+function parseFollowUps(content: string): string[] {
+  const match = content.match(/<followups>([\s\S]*?)<\/followups>/)
+  if (!match) return []
+  return match[1].trim().split("\n").map((s) => s.trim()).filter(Boolean)
+}
+
 export function ChatShell() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [loadingSession, setLoadingSession] = useState(false)
@@ -29,7 +36,6 @@ export function ChatShell() {
     getSessions().then(setSessions)
   }, [])
 
-  // On mount: new chat on first page load, restore session on in-app navigation
   useEffect(() => {
     refreshSessions()
     if (!hasInitialized) {
@@ -48,7 +54,6 @@ export function ChatShell() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Persist active session whenever it changes
   useEffect(() => {
     if (sessionId) {
       sessionStorage.setItem(STORAGE_KEY, sessionId)
@@ -76,6 +81,24 @@ export function ChatShell() {
     refreshSessions()
   }, [sendMessage, refreshSessions])
 
+  const handleDeleteSession = useCallback((id: string) => {
+    setSessions(prev => prev.filter(s => s.id !== id))
+    if (id === sessionId) {
+      sessionStorage.removeItem(STORAGE_KEY)
+      resetSession()
+    }
+    deleteSession(id).catch(() => refreshSessions())
+  }, [sessionId, resetSession, refreshSessions])
+
+  const followUps = useMemo(() => {
+    if (isLoading || loadingSession || streamingContent !== null) return []
+    const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant")
+    if (!lastAssistant) return []
+    return parseFollowUps(lastAssistant.content)
+  }, [messages, isLoading, loadingSession, streamingContent])
+
+  const busy = isLoading || loadingSession
+
   return (
     <div className="flex h-[calc(100vh-4rem)] -m-6">
       <div className="w-60 shrink-0">
@@ -84,6 +107,7 @@ export function ChatShell() {
           activeSessionId={sessionId}
           onNewChat={handleNewChat}
           onSelectSession={handleSelectSession}
+          onDeleteSession={handleDeleteSession}
         />
       </div>
 
@@ -95,14 +119,14 @@ export function ChatShell() {
         <MessageList
           messages={messages}
           streamingContent={streamingContent}
-          isLoading={isLoading || loadingSession}
+          isLoading={busy}
         />
 
         {error && (
           <p className="text-xs text-red-500 text-center px-4 pb-1">{error}</p>
         )}
 
-        {messages.length === 0 && !isLoading && !loadingSession && (
+        {messages.length === 0 && !busy && (
           <div className="px-4 pb-2 flex flex-wrap gap-2 justify-center max-w-4xl mx-auto w-full">
             {PROMPT_SUGGESTIONS.map((prompt) => (
               <button
@@ -116,7 +140,22 @@ export function ChatShell() {
           </div>
         )}
 
-        <MessageInput onSend={handleSend} disabled={isLoading || loadingSession} />
+        {followUps.length > 0 && (
+          <div className="px-4 pb-2 flex flex-wrap gap-1.5 max-w-4xl mx-auto w-full">
+            {followUps.map((q) => (
+              <button
+                key={q}
+                onClick={() => handleSend(q)}
+                className="flex items-center gap-1.5 text-xs border border-primary/30 rounded-full px-3 py-1.5 bg-background hover:bg-primary/5 hover:border-primary/60 transition-colors text-primary/80 hover:text-primary cursor-pointer text-left"
+              >
+                <CornerDownRight className="h-3 w-3 shrink-0" />
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <MessageInput onSend={handleSend} disabled={busy} />
       </div>
     </div>
   )

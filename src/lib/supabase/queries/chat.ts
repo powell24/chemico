@@ -51,6 +51,14 @@ export async function updateSessionTitle(sessionId: string, title: string): Prom
   await supabase.from("chat_sessions").update({ title }).eq("id", sessionId)
 }
 
+export async function deleteSession(sessionId: string): Promise<void> {
+  const supabase = createClient()
+  const { error: msgError } = await supabase.from("chat_messages").delete().eq("session_id", sessionId)
+  if (msgError) throw new Error(msgError.message)
+  const { error: sessionError } = await supabase.from("chat_sessions").delete().eq("id", sessionId)
+  if (sessionError) throw new Error(sessionError.message)
+}
+
 export async function saveMessage({
   sessionId,
   role,
