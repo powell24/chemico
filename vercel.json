@@ -1,5 +1,5 @@
 {
-  "regions": ["sin", "syd"],
+  "regions": ["sin"],
   "functions": {
     "src/app/api/**": {
       "maxDuration": 300,
